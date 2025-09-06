@@ -1,40 +1,120 @@
 #include <stdio.h>
 
-// Desafio Batalha Naval - MateCheck
-// Este código inicial serve como base para o desenvolvimento do sistema de Batalha Naval.
-// Siga os comentários para implementar cada parte do desafio.
+// VOCABULARIO TABULEIRO:
+#define TAMANHO_TABULEIRO  10
+#define TAMANHO_NAVIO       3
+#define NAVIO               3
+#define AGUA                0
+
+
+
+// VOCABULARIO DE DIREÇÕES:
+#define DIRECAO_VERTICAL    'V'
+#define DIRECAO_HORIZONTAL  'H'
+
+
+// AÇÕES TABULEIRO:
+#define TABULEIRO_LIMPAR    -1
+#define TABULEIRO_EXIBIR    -2
+
+
+
+/*
+    A função que faz a inicialização do tabuleiro, também usei para exibir,
+    com objetivo de não ter loops desnecessários no código.
+
+    Parâmetros:
+        - tabuleiro[][] > indica nossa matriz que será trabalhada no tabuleiro
+        - acao > variável que indica ação.
+*/
+void Tabuleiro(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO], int acao){
+    /*
+        A seguir, dois loops onde percorre a matriz Tabuleiro, 
+        adicionando o valor da água em todos os vetores. 
+
+        Vetores serão de 0 à 10, exemplo:
+
+        tabuleiro[0][0] = AGUA;
+        tabuleiro[0][1] = AGUA;
+        tabuleiro[0][2] = AGUA;
+        ...
+        tabuleiro[9][0] = AGUA;
+        tabuleiro[9][1] = AGUA;
+    */
+
+    // Looping percorrendo as linhas
+    for(int i = 0; i < TAMANHO_TABULEIRO; i++){
+
+        // Looping percorrendo colunas
+        for(int x = 0; x < TAMANHO_TABULEIRO; x++){
+
+            if(acao == TABULEIRO_LIMPAR){
+                tabuleiro[i][x] = AGUA;
+            }
+
+            if(acao == TABULEIRO_EXIBIR){
+                printf("%d ", tabuleiro[i][x]);
+            }
+        }
+
+        if(acao == TABULEIRO_EXIBIR){
+            printf("\n");
+        }
+
+    }
+}
+
+
+// Função que faz a adição e posicionamento de navios no tabuleiro.
+void TabuleiroPosicionar(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO], int pos_linha, int pos_coluna, char direcao){
+
+    /*
+        Loop do navio, onde adiciona o posicionamento do navio na matriz tabuleiro.
+    */
+    for(int i = 0; i < TAMANHO_NAVIO; i++){
+
+        // Caso for alteração VERTICAL, definido pela variavel direcao
+        if(direcao == DIRECAO_VERTICAL)
+        {
+            tabuleiro[pos_linha+i][pos_coluna] = NAVIO;
+        }
+
+        // Caso for alteração HORIZONTAL, definido pela variavel direcao
+        else if(direcao == DIRECAO_HORIZONTAL)
+        {
+            tabuleiro[pos_linha][pos_coluna+i] = NAVIO;    
+        }        
+    }
+
+}
+
 
 int main() {
-    // Nível Novato - Posicionamento dos Navios
-    // Sugestão: Declare uma matriz bidimensional para representar o tabuleiro (Ex: int tabuleiro[5][5];).
-    // Sugestão: Posicione dois navios no tabuleiro, um verticalmente e outro horizontalmente.
-    // Sugestão: Utilize `printf` para exibir as coordenadas de cada parte dos navios.
 
-    // Nível Aventureiro - Expansão do Tabuleiro e Posicionamento Diagonal
-    // Sugestão: Expanda o tabuleiro para uma matriz 10x10.
-    // Sugestão: Posicione quatro navios no tabuleiro, incluindo dois na diagonal.
-    // Sugestão: Exiba o tabuleiro completo no console, mostrando 0 para posições vazias e 3 para posições ocupadas.
+    // Cria uma matriz, dois vetores com o tamanho de cada vetor especificado.
+    int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO];
 
-    // Nível Mestre - Habilidades Especiais com Matrizes
-    // Sugestão: Crie matrizes para representar habilidades especiais como cone, cruz, e octaedro.
-    // Sugestão: Utilize estruturas de repetição aninhadas para preencher as áreas afetadas por essas habilidades no tabuleiro.
-    // Sugestão: Exiba o tabuleiro com as áreas afetadas, utilizando 0 para áreas não afetadas e 1 para áreas atingidas.
+    // Faz a inicialização do tabuleiro, colocando 0 em todos os vetores.
+    Tabuleiro(tabuleiro, TABULEIRO_LIMPAR);
 
-    // Exemplos de exibição das habilidades:
-    // Exemplo para habilidade em cone:
-    // 0 0 1 0 0
-    // 0 1 1 1 0
-    // 1 1 1 1 1
-    
-    // Exemplo para habilidade em octaedro:
-    // 0 0 1 0 0
-    // 0 1 1 1 0
-    // 0 0 1 0 0
 
-    // Exemplo para habilidade em cruz:
-    // 0 0 1 0 0
-    // 1 1 1 1 1
-    // 0 0 1 0 0
+    // Inicializando variaveis de posicionamento:
+    int linha, coluna;
 
+    // Adição do primeiro navio na vertical.
+    linha    = 2;
+    coluna   = 3;
+    TabuleiroPosicionar(tabuleiro, linha, coluna, DIRECAO_VERTICAL);
+
+
+    // Adição do segundo navio na horizontal.
+    linha    = 4;
+    coluna   = 5;
+    TabuleiroPosicionar(tabuleiro, linha, coluna, DIRECAO_HORIZONTAL);
+
+
+    Tabuleiro(tabuleiro, TABULEIRO_EXIBIR);
     return 0;
 }
+
+
