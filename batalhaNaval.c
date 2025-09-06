@@ -5,12 +5,14 @@
 #define TAMANHO_NAVIO       3
 #define NAVIO               3
 #define AGUA                0
-
+#define NAVIOS              4 // Quantidades de Navios no Tabuleiro
 
 
 // VOCABULARIO DE DIREÇÕES:
-#define DIRECAO_VERTICAL    'V'
-#define DIRECAO_HORIZONTAL  'H'
+#define ORIENTACAO_VERTICAL            'V'
+#define ORIENTACAO_HORIZONTAL          'H'
+#define ORIENTACAO_DIAGONAL_DIREITA    'D'
+#define ORIENTACAO_DIAGONAL_ESQUERDA   'E'
 
 
 // AÇÕES TABULEIRO:
@@ -66,26 +68,143 @@ void Tabuleiro(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO], int acao){
 
 
 // Função que faz a adição e posicionamento de navios no tabuleiro.
-void TabuleiroPosicionar(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO], int pos_linha, int pos_coluna, char direcao){
+void TabuleiroPosicionar(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO], int pos_linha, int pos_coluna, char orientacao){
 
     /*
         Loop do navio, onde adiciona o posicionamento do navio na matriz tabuleiro.
     */
     for(int i = 0; i < TAMANHO_NAVIO; i++){
 
-        // Caso for alteração VERTICAL, definido pela variavel direcao
-        if(direcao == DIRECAO_VERTICAL)
-        {
-            tabuleiro[pos_linha+i][pos_coluna] = NAVIO;
-        }
+        switch(orientacao){
+            case ORIENTACAO_VERTICAL:{
+                // Incrementa o valor de i na posição da coluna
+                tabuleiro[pos_linha+i][pos_coluna] = NAVIO;
+                break;
+            }
 
-        // Caso for alteração HORIZONTAL, definido pela variavel direcao
-        else if(direcao == DIRECAO_HORIZONTAL)
-        {
-            tabuleiro[pos_linha][pos_coluna+i] = NAVIO;    
-        }        
+            case ORIENTACAO_HORIZONTAL:{
+                // Incrementa o valor de i na posição da linha
+                tabuleiro[pos_linha][pos_coluna+i] = NAVIO;   
+                break; 
+            } 
+
+            case ORIENTACAO_DIAGONAL_ESQUERDA:{
+                // Decrementa o valor de i da linha e incrementa valor da coluna
+                tabuleiro[pos_linha-i][pos_coluna-i] = NAVIO;
+                break;
+            }
+
+            case ORIENTACAO_DIAGONAL_DIREITA:{
+                // Decrementa o valor de i da linha, e incrementa valor i da coluna  
+                tabuleiro[pos_linha-i][pos_coluna+i] = NAVIO;
+                break;
+            }
+        }       
     }
 
+}
+
+
+/*
+    Função à seguir, verifica o posicionamento se pode-ser adicionado o navio no tabuleiro.
+
+    Verificações:
+    - se o Navio respeita o espaço do tabuleiro, que está definido na constante TAMANHO_TABULEIRO;
+    - verifica se o navio não se sobrepoe outro navio já no tabuleiro.
+
+    Retornos:
+    - retorna 0: caso ele sobrepõe outro navio;
+    - retorna -1; caso ele não respeita a dimensão do tabuleiro;
+    - retorna 1: caso ele respeita a dimensão do tabuleiro e não sobrepõe outro navio;
+*/
+int VerificaPosicionamento(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO], int pos_linha, int pos_coluna, char orientacao){
+
+    // Variável de controle e retorno da função.
+    int status_posicao = 1;
+
+
+    /* 
+        Checagem simples da posição:
+        Verifica se a posição linha e coluna não excedem o tabuleiro
+    */
+    if(pos_linha <= 0 || pos_linha >= TAMANHO_TABULEIRO || pos_coluna < 0 || pos_coluna > TAMANHO_TABULEIRO)
+    {
+        return -1;
+    }
+
+
+    /*
+        Checagem para verificar se o barco formado, não excede o tabuleiro
+        e também verifica se sobrepõe outro navio.
+    */ 
+    int NAVIO_MONTADO = (TAMANHO_NAVIO-1);
+
+    for(int i = 0; i < TAMANHO_NAVIO && status_posicao == 1; i++){
+
+        switch(orientacao){
+            case ORIENTACAO_VERTICAL:{
+
+                /*
+                    Verificando se o navio formado, não excede o tabuleiro:
+                    somando a linha + Tamanho do Navio.
+                */ 
+                status_posicao = (pos_linha+NAVIO_MONTADO >= TAMANHO_TABULEIRO) ? -1 : 1;
+
+                // Verificando sobreposição
+                if(status_posicao == 1){
+                    status_posicao = (tabuleiro[pos_linha+i][pos_coluna] == NAVIO) ? 0 : 1;
+                }
+                break;
+            }
+
+            case ORIENTACAO_HORIZONTAL:{
+                
+                /*
+                    Verificando se o navio formado, não excede o tabuleiro:
+                    somando a coluna + Tamanho do Navio.
+                */    
+                status_posicao = (pos_coluna+NAVIO_MONTADO >= TAMANHO_TABULEIRO) ? -1 : 1;
+
+                // Verificando sobreposição
+                if(status_posicao == 1){
+                    status_posicao = (tabuleiro[pos_linha][pos_coluna+i] == NAVIO) ? 0 : 1;
+                }
+                break; 
+            } 
+
+            case ORIENTACAO_DIAGONAL_ESQUERDA:{
+                /*
+                    Verificando se o navio formado, não excede o tabuleiro:
+                    subtraindo a linha com o Tamanho do Navio e também
+                    subtraindo a coluna com o tamanho do navio.
+                */  
+                status_posicao = (pos_linha-NAVIO_MONTADO < 0 || pos_coluna-NAVIO_MONTADO < 0) ? -1 : 1;
+
+                // Verificando se o navio não sobrepõe outro
+                if(status_posicao == 1){
+                    status_posicao = (tabuleiro[pos_linha-i][pos_coluna-i] == NAVIO) ? 0 : 1;
+                }
+                break;
+            }
+
+            case ORIENTACAO_DIAGONAL_DIREITA:{
+                /*
+                    Verificando se o navio formado, não excede o tabuleiro:
+                    subtraindo a linha com o Tamanho do Navio e também
+                    somando a coluna com o tamanho do navio.
+                */ 
+                status_posicao = (0 > pos_linha-(NAVIO_MONTADO) || pos_coluna+(NAVIO_MONTADO) < 0) ? -1 : 1;
+
+                // Verificando se o navio, não sobrepõe outro:
+                if(status_posicao == 1){
+                    status_posicao = (tabuleiro[pos_linha-i][pos_coluna+i] == NAVIO) ? 0 : 1;
+                }
+                break;
+            }       
+        } 
+    }
+
+    return status_posicao;
 }
 
 
@@ -99,18 +218,60 @@ int main() {
 
 
     // Inicializando variaveis de posicionamento:
-    int linha, coluna;
+    int navio[NAVIOS][3];
 
-    // Adição do primeiro navio na vertical.
-    linha    = 2;
-    coluna   = 3;
-    TabuleiroPosicionar(tabuleiro, linha, coluna, DIRECAO_VERTICAL);
+    /*
+        NAVIO ID 0
+        ORIENTAÇÃO VERTICAL
+    */
+    navio[0][0] = 2;
+    navio[0][1] = 3;
+    navio[0][2] = ORIENTACAO_VERTICAL;
 
 
-    // Adição do segundo navio na horizontal.
-    linha    = 4;
-    coluna   = 5;
-    TabuleiroPosicionar(tabuleiro, linha, coluna, DIRECAO_HORIZONTAL);
+    /*
+        NAVIO ID 1
+        ORIENTAÇÃO VERTICAL
+    */
+    navio[1][0] = 3;
+    navio[1][1] = 6;
+    navio[1][2] = ORIENTACAO_VERTICAL;
+
+
+    /*
+        NAVIO ID 2
+        ORIENTAÇÃO DIAGONAL ESQUERDA
+    */
+    navio[2][0] = 9;
+    navio[2][1] = 8;
+    navio[2][2] = ORIENTACAO_DIAGONAL_ESQUERDA;
+
+
+    /*
+        NAVIO ID 3
+        ORIENTAÇÃO DIAGONAL DIREITA
+    */
+    navio[3][0] = 9;
+    navio[3][1] = 1;
+    navio[3][2] = ORIENTACAO_DIAGONAL_DIREITA;
+
+    // 
+
+    printf("Bem vindo ao Tabuleiro, montando tabuleiro e navios!\n");
+    for(int i = 0; i < NAVIOS; i++){
+
+        int posicao_valida = VerificaPosicionamento(tabuleiro, navio[i][0], navio[i][1], navio[i][2]);
+
+        if(posicao_valida == -1){
+            printf("Erro ao montar navio id %d, não respeita as dimensões o tabulario\n", i);
+        }
+        if(posicao_valida == 0){
+            printf("Erro ao montar navio id %d, este navio irá sobrepor outro já existente.\n", i);
+        }
+        else{
+            TabuleiroPosicionar(tabuleiro, navio[i][0], navio[i][1], navio[i][2]);
+        }
+    }
 
 
     Tabuleiro(tabuleiro, TABULEIRO_EXIBIR);
