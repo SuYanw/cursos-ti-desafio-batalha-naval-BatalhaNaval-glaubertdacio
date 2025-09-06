@@ -14,6 +14,10 @@
 #define ORIENTACAO_DIAGONAL_DIREITA    'D'
 #define ORIENTACAO_DIAGONAL_ESQUERDA   'E'
 
+// VOCABULARIO HABILIDADES
+#define HABILIDADE_CONE                 'C'
+#define HABILIDADE_OCTAEDRO             'O'
+#define HABILIDADE_CRUZ                 'Z'
 
 // AÇÕES TABULEIRO:
 #define TABULEIRO_LIMPAR    -1
@@ -208,6 +212,58 @@ int VerificaPosicionamento(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO], 
 }
 
 
+void Ataque(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO], char ataque,int pos_linha, int pos_coluna){
+    switch(ataque){
+        case HABILIDADE_CONE:{
+
+            for(int i = 0; i < 3; i++){
+                tabuleiro[pos_linha+i][pos_coluna] = 5;
+
+                if(i == 2){
+                    for (int j = pos_linha-i; j >= 1; --j){
+                        tabuleiro[pos_linha+i][pos_coluna+j] = 5;
+                        tabuleiro[pos_linha+i][pos_coluna-j] = 5;
+                    }
+                }
+                if(i == 1){
+                    for (int j = pos_linha-3; j >= 1; --j){
+                        tabuleiro[pos_linha+i][pos_coluna+j] = 5;
+                        tabuleiro[pos_linha+i][pos_coluna-j] = 5;
+                    }       
+                }
+            }
+            break;
+        }
+
+        case HABILIDADE_CRUZ:{
+
+            for(int i = -1; i < 3; i++){
+                tabuleiro[pos_linha+i][pos_coluna] = 5;
+            }
+            for(int i = -2; i < 3; i++){
+                tabuleiro[pos_linha][pos_coluna+i] = 5;
+            }
+
+            // tabuleiro[pos_linha][pos_coluna] = 1;
+            break;
+        }
+        case HABILIDADE_OCTAEDRO:{
+            for(int i = 0; i < 3; i++){
+                tabuleiro[pos_linha+i][pos_coluna] = 5;
+
+                if(i == 1){
+                    for (int j = pos_linha-1; j > 1; --j){
+                        tabuleiro[pos_linha+i][pos_coluna+1] = 5;
+                        tabuleiro[pos_linha+i][pos_coluna-1] = 5;
+                    }
+                }
+            }
+            break;   
+        }
+    }
+}
+
+
 int main() {
 
     // Cria uma matriz, dois vetores com o tamanho de cada vetor especificado.
@@ -273,9 +329,24 @@ int main() {
         }
     }
 
-
     Tabuleiro(tabuleiro, TABULEIRO_EXIBIR);
+
+    printf("Mostrar habilidades? (y/n)\nRe:");
+
+    char mostrar_habilidades;
+    scanf("%c", &mostrar_habilidades);
+
+    if(mostrar_habilidades == 'y')
+
+        printf("Limpando Tabulário...\n\n");
+        Tabuleiro(tabuleiro, TABULEIRO_LIMPAR);
+
+        Ataque(tabuleiro, HABILIDADE_CRUZ, 1, 5);  
+
+        Ataque(tabuleiro, HABILIDADE_OCTAEDRO, 6, 1); 
+
+        Ataque(tabuleiro, HABILIDADE_CONE, 4, 6); 
+
+        Tabuleiro(tabuleiro, TABULEIRO_EXIBIR); 
     return 0;
 }
-
-
